@@ -1,14 +1,11 @@
 package de.dhbw.visualizer;
 
+import de.dhbw.visualizer.mesh.MeshFactory;
 import de.orat.math.view.euclidview3d.GeometryView3d;
 import de.orat.math.xml.urdf.Visualizer;
-import de.orat.math.xml.urdf.api.Chain;
-import de.orat.math.xml.urdf.api.Urdf;
-import de.orat.view3d.euclid3dviewapi.api.ViewerService;
 import org.jogamp.vecmath.Matrix4d;
-import org.jogamp.vecmath.Point3d;
 
-import java.awt.*;
+import java.io.File;
 
 public class Main extends GeometryView3d {
 
@@ -23,12 +20,14 @@ public class Main extends GeometryView3d {
 
         Visualizer visualizer = new Visualizer();
 
-        if (visualizer.getViewer() != null){
-           // Urdf jurdf = new Urdf(visualizer.getClass().getResourceAsStream("ur5eA.urdf"));
+        var mesh = MeshFactory.loadDaeMesh(new File("111"));
+      //  visualizer.getViewer().
+        if (visualizer.getViewer() != null) {
+            // Urdf jurdf = new Urdf(visualizer.getClass().getResourceAsStream("ur5eA.urdf"));
             //Chain chain = jurdf.createChain();
 
             visualizer.getViewer().open();
-            visualizer.getViewer().addMesh("/data/objfiles/base.dae",new Matrix4d());
+            visualizer.getViewer().addMesh("/data/objfiles/base.dae", new Matrix4d());
 
             //visualizer.add(chain);
 
