@@ -1,13 +1,10 @@
 package de.dhbw.visualizer;
 
-import de.orat.math.view.euclidview3d.test.robot.DH;
-import de.orat.math.xml.urdf.api.Urdf;
 import org.jzy3d.analysis.AbstractAnalysis;
 import org.jzy3d.analysis.AnalysisLauncher;
 import org.jzy3d.chart.Chart;
 import org.jzy3d.chart.factories.NewtChartFactory;
 import org.jzy3d.plot3d.primitives.Drawable;
-import org.jzy3d.plot3d.primitives.EuclidRobot;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 
 import java.util.ArrayList;
@@ -57,8 +54,8 @@ public class DemoViewer extends AbstractAnalysis {
     }
 
     private void initRobot() {
-       // Urdf urdf=new Urdf(null);
-       // DH dh = new DH(3f, 3f, 3f, 3f);
+        // Urdf urdf=new Urdf(null);
+        // DH dh = new DH(3f, 3f, 3f, 3f);
         //
     }
 }
