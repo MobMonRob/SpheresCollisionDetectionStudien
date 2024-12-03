@@ -1,6 +1,7 @@
 package de.dhbw.visualizer.object.mesh;
 
-import de.orat.math.xml.urdf.api.Chain;
+import lombok.Getter;
+import lombok.Setter;
 import org.jzy3d.maths.Coord3d;
 import org.jzy3d.plot3d.primitives.Composite;
 import org.jzy3d.plot3d.transform.Rotate;
@@ -11,13 +12,32 @@ import java.util.List;
 
 public class MeshPart extends Composite {
 
+    @Getter
+    @Setter
+    private Coord3d localVectorSystemX;
+    @Getter
+    @Setter
+    private Coord3d localVectorSystemY;
+    @Getter
+    @Setter
+    private Coord3d localVectorSystemZ;
+    @Getter
+    @Setter
+    private Coord3d center;
+
     public MeshPart(List<MeshVBO> initElements) {
         initElements.forEach(this::add);
+
+        localVectorSystemX = new Coord3d(1, 0, 0);
+        localVectorSystemY = new Coord3d(0, 1, 0);
+        localVectorSystemZ = new Coord3d(0, 1, 0);
+        center = new Coord3d(0.0F, 0.0F, 0.0F);
     }
 
     public MeshPart translateAlongVector(float distance, Coord3d vector) {
         var translate = calculateTranslation(distance, vector);
         transform(translate);
+
         return this;
     }
 
