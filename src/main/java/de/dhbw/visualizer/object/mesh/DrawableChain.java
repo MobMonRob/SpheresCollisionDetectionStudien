@@ -20,7 +20,7 @@ public class DrawableChain extends Composite {
             add(value);
         }
 
-        moveDH();
+        //moveDH();
     }
 
     public void moveDH() {

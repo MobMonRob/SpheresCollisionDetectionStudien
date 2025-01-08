@@ -2,22 +2,29 @@ package de.dhbw.visualizer.object.mesh;
 
 import org.jzy3d.maths.Coord3d;
 import org.jzy3d.plot3d.primitives.vbo.drawable.DrawableVBO2;
+import org.jzy3d.plot3d.transform.Transform;
 import org.jzy3d.plot3d.transform.Transformer;
 
 import java.util.Arrays;
 
 public class MeshVBO extends DrawableVBO2 {
 
-    private final float[] copyOfVertices;
+    //private final float[] copyOfVertices;
 
     public MeshVBO(float[] points, int pointDimensions) {
         super(points, pointDimensions);
 
-        this.copyOfVertices = Arrays.copyOf(points, points.length);
+      //  this.copyOfVertices = Arrays.copyOf(points, points.length);
         this.setWireframeDisplayed(false);
     }
 
-    public float[] transform(Transformer translate) {
+    @Override
+    public void setTransform(Transform transform) {
+        super.setTransform(transform);
+    }
+
+
+/* public float[] transform(Transform translate) {
         float[] newVertices = new float[this.copyOfVertices.length];
 
         for (int i = 0; i < newVertices.length - 2; i += 3) {
@@ -29,5 +36,5 @@ public class MeshVBO extends DrawableVBO2 {
         }
 
         return newVertices;
-    }
+    }*/
 }

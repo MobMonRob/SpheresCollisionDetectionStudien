@@ -4,6 +4,7 @@ import org.jzy3d.analysis.AbstractAnalysis;
 import org.jzy3d.analysis.AnalysisLauncher;
 import org.jzy3d.chart.Chart;
 import org.jzy3d.chart.factories.NewtChartFactory;
+import org.jzy3d.maths.Coord2d;
 import org.jzy3d.plot3d.primitives.Drawable;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 

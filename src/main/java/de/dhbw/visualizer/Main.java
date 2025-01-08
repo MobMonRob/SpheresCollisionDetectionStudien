@@ -12,6 +12,7 @@ import org.jzy3d.maths.Coord3d;
 public class Main extends Visualizer {
 
     public static void main(String[] args) throws Exception {
+
         System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
         DemoViewer demoViewer = DemoViewer.initAndOpen();
 
@@ -19,10 +20,8 @@ public class Main extends Visualizer {
         Chain chain = jurdf.createChain();
 
         // var mesh = new ChainMesh(chain);
-
-        demoViewer.add(DrawableChainLoader.load(chain));
+        DrawableChainLoader.load(demoViewer.getChart(), chain);
         // lastMesh.translateAlongVector(300, new Coord3d(0, 200, 200));
-
     }
 
     public Main() throws Exception {
