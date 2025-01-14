@@ -41,7 +41,7 @@ public class DemoViewer extends AbstractAnalysis {
         var view = chart.getView();
         view.setSquared(false);
 
-        new Thread(() -> {
+      /*  new Thread(() -> {
             try {
                 while (true) {
                     runnables.forEach(Runnable::run);
@@ -51,7 +51,7 @@ public class DemoViewer extends AbstractAnalysis {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-        }).start();
+        }).start();*/
     }
 
     private void initRobot() {

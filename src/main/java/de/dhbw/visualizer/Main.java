@@ -20,7 +20,8 @@ public class Main extends Visualizer {
         Chain chain = jurdf.createChain();
 
         // var mesh = new ChainMesh(chain);
-        DrawableChainLoader.load(demoViewer.getChart(), chain);
+        DrawableChainLoader.loadAndTestBaseModel(demoViewer.getChart());
+        //TODO Production DrawableChainLoader.load(demoViewer.getChart(), chain);
         // lastMesh.translateAlongVector(300, new Coord3d(0, 200, 200));
     }
 

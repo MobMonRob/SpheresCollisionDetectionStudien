@@ -33,6 +33,7 @@ public class MeshPart extends Composite {
         localVectorSystemY = new Coord3d(0, 1, 0);
         localVectorSystemZ = new Coord3d(0, 1, 0);
         center = new Coord3d(0.0F, 0.0F, 0.0F);
+
     }
 
     public MeshPart translateAlongVector(float distance, Coord3d vector) {
@@ -68,7 +69,7 @@ public class MeshPart extends Composite {
         this.clear();
         newObjects.forEach(this::add);*/
 
-        setTransform(transformer);
+        //setTransform(transformer);
         //setTransformBefore(transformer);
     }
 

@@ -1,5 +1,6 @@
 package de.dhbw.visualizer.object;
 
+import de.dhbw.visualizer.AxisForm;
 import de.dhbw.visualizer.object.mesh.DrawableChain;
 import de.dhbw.visualizer.object.mesh.MeshPart;
 import de.orat.math.xml.urdf.api.Chain;
@@ -20,6 +21,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DrawableChainLoader {
+
+    public static void loadAndTestBaseModel(Chart chart) {
+        {
+            var path = "./meshes/ur5e/visual/base.dae";
+            var obj = ObjectLoader.getCOLLADA(path);
+
+
+            chart.add(obj, true);
+            obj.setTransformBefore(new Transform(
+                    // new Scale(new Coord3d(0.5f, 0.5f, 0.5f)),
+                    AxisForm.rpyToAxisAngle(0, 0, Math.PI)
+            ));
+        }
+        chart.render();
+    }
 
     public static void load(Chart chart, Chain chain) {
         //Map<String, MeshPart> meshes = new HashMap<>();
