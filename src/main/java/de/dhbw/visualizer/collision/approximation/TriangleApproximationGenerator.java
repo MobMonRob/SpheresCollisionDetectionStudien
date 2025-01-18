@@ -1,6 +1,6 @@
 package de.dhbw.visualizer.collision.approximation;
 
-import de.dhbw.visualizer.Sphere;
+import de.dhbw.visualizer.math.Sphere;
 import de.dhbw.visualizer.math.Triangle;
 
 import java.util.List;

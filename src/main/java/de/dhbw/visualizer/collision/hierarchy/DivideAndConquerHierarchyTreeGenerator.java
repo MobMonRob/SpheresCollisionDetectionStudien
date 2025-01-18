@@ -1,6 +1,6 @@
 package de.dhbw.visualizer.collision.hierarchy;
 
-import de.dhbw.visualizer.Sphere;
+import de.dhbw.visualizer.math.Sphere;
 import de.dhbw.visualizer.math.Discriminator;
 import de.dhbw.visualizer.math.RectangularBB;
 import de.dhbw.visualizer.tree.Node;
@@ -100,10 +100,11 @@ public class DivideAndConquerHierarchyTreeGenerator implements HierarchyTreeGene
         heuristic methods and select the smaller of the two
         spheres. The first method finds a bounding sphere that
         contains the spheres of the two children nodes and hence,
-        by induction, all the descendant leaf nodes. The position
-        and size of such a sphere can be determined optimally and
-        uniquely as we are only bounding two spheres; the details
-        are trivial and not included here. The second method
+        by induction, all the descendant leaf nodes.
+        
+        The position and size of such a sphere can be determined optimally and uniquely as we are only bounding two spheres; the details are trivial and not included here.
+
+        The second method
         directly considers the leaf spheres. We first select a
         center for the bounding sphere and then examine each of
         the descendant leaf spheres to determine the minimum

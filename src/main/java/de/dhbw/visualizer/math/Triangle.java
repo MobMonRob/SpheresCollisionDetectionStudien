@@ -1,4 +1,6 @@
 package de.dhbw.visualizer.math;
 
-public record Triangle() {
+import org.joml.Vector3d;
+
+public record Triangle(Vector3d p1, Vector3d p2, Vector3d p3) {
 }

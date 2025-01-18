@@ -1,4 +1,4 @@
-package de.dhbw.visualizer;
+package de.dhbw.visualizer.math;
 
 import org.joml.Vector3d;
 
