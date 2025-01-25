@@ -1,12 +1,13 @@
 package de.dhbw.visualizer.collision.approximation;
 
 import de.dhbw.visualizer.math.Sphere;
+import de.orat.math.xml.urdf.visual.Shape;
 
 import java.util.List;
 
-public interface SphereApproximationGenerator<T> {
+public interface SphereApproximationGenerator {
 
-    List<Sphere> toSphere(T inputData);
+    List<Sphere> toSphere(Shape inputData);
 
-    Class<T> getInputClass();
+    Shape.ShapeType getShapeType();
 }

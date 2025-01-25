@@ -95,16 +95,7 @@ public class DivideAndConquerHierarchyTreeGenerator implements HierarchyTreeGene
 
     private Sphere calculateCompleteSphere(Node upper, Node lower) {
         /*
-        There is no obvious way to compute the smallest
-        sphere that contains a set of spheres, so we use two
-        heuristic methods and select the smaller of the two
-        spheres. The first method finds a bounding sphere that
-        contains the spheres of the two children nodes and hence,
-        by induction, all the descendant leaf nodes.
-        
-        The position and size of such a sphere can be determined optimally and uniquely as we are only bounding two spheres; the details are trivial and not included here.
-
-        The second method
+        TODO The second method
         directly considers the leaf spheres. We first select a
         center for the bounding sphere and then examine each of
         the descendant leaf spheres to determine the minimum
@@ -114,7 +105,6 @@ public class DivideAndConquerHierarchyTreeGenerator implements HierarchyTreeGene
         the process of dividing the leaf spheres. The first method
         works well near the leaves of the tree, while the second
         methods produces better results closer to the root.
-        TODO implement the other described way
          */
         return calculateCompleteSphereFromChildren(upper.sphere(), lower.sphere());
     }
