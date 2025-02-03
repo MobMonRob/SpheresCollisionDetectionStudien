@@ -18,6 +18,13 @@ public record Sphere(Vector3d center, double radius) {
         return center.z();
     }
 
+    public double distance(Sphere other) {
+        double dx = this.x() - other.x();
+        double dy = this.y() - other.y();
+        double dz = this.z() - other.z();
+        return Math.sqrt(dx * dx + dy * dy + dz * dz) - (this.radius + other.radius);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
