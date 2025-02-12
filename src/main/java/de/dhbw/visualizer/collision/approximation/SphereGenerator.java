@@ -5,7 +5,7 @@ import de.orat.math.xml.urdf.visual.Shape;
 
 import java.util.List;
 
-public interface SphereApproximationGenerator {
+public interface SphereGenerator {
 
     List<Sphere> toSphere(Shape inputData);
 

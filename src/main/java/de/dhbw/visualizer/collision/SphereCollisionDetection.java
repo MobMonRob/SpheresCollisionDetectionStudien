@@ -1,7 +1,6 @@
 package de.dhbw.visualizer.collision;
 
-import com.google.common.base.Preconditions;
-import de.dhbw.visualizer.collision.approximation.SphereApproximationGenerator;
+import de.dhbw.visualizer.collision.approximation.SphereGenerator;
 import de.dhbw.visualizer.collision.hierarchy.HierarchyTreeGenerator;
 import de.dhbw.visualizer.math.Sphere;
 import de.dhbw.visualizer.tree.Node;
@@ -9,6 +8,7 @@ import de.orat.math.xml.urdf.api.Chain;
 import de.orat.math.xml.urdf.api.CollisionParameters;
 import de.orat.math.xml.urdf.api.Link;
 import de.orat.math.xml.urdf.visual.Shape;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,9 +21,11 @@ public final class SphereCollisionDetection {
         return new Builder();
     }
 
-    private final Map<Shape.ShapeType, SphereApproximationGenerator> approximation;
+    private final Map<Shape.ShapeType, SphereGenerator> approximation;
     private final HierarchyTreeGenerator hierarchyTreeGenerator;
     private final Map<Link, Node> boundingBoxRepresentations = new HashMap<>();
+    @Getter
+    private final Map<Link, List<Sphere>> rawSpheres = new HashMap<>();
 
     private SphereCollisionDetection(Builder builder) {
         this.approximation = builder.approximation;
@@ -38,6 +40,7 @@ public final class SphereCollisionDetection {
 
     private void setupLink(Link link) {
         var spheres = toSpheres(link);
+        this.rawSpheres.put(link, spheres);
         var tree = this.hierarchyTreeGenerator.constructHierarchyTree(spheres);
 
         boundingBoxRepresentations.put(link, tree);
@@ -61,14 +64,14 @@ public final class SphereCollisionDetection {
 
     public static class Builder {
 
-        private final Map<Shape.ShapeType, SphereApproximationGenerator> approximation = new HashMap<>();
+        private final Map<Shape.ShapeType, SphereGenerator> approximation = new HashMap<>();
         private Chain chain;
         private HierarchyTreeGenerator hierarchyTreeGenerator;
 
         private Builder() {
         }
 
-        public Builder approximation(SphereApproximationGenerator approximationGenerator) {
+        public Builder approximation(SphereGenerator approximationGenerator) {
             this.approximation.put(approximationGenerator.getShapeType(), approximationGenerator);
             return this;
         }

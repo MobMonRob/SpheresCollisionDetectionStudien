@@ -1,10 +1,12 @@
 package de.dhbw.visualizer;
 
 import de.dhbw.visualizer.math.Triangle;
+import org.apache.commons.io.IOUtils;
 import org.joml.Vector3d;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -30,6 +32,11 @@ public record Stl(
 
             return fromBuffer(buffer);
         }
+    }
+
+    public static Stl fromStream(InputStream inputStream) throws IOException {
+        var bytes = IOUtils.toByteArray(inputStream);
+        return fromBuffer(ByteBuffer.wrap(bytes));
     }
 
     private static Stl fromBuffer(ByteBuffer byteBuffer) throws IOException {

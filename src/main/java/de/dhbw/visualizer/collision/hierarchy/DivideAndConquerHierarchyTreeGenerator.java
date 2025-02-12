@@ -1,39 +1,23 @@
 package de.dhbw.visualizer.collision.hierarchy;
 
-import de.dhbw.visualizer.math.Sphere;
 import de.dhbw.visualizer.math.Discriminator;
 import de.dhbw.visualizer.math.RectangularBB;
+import de.dhbw.visualizer.math.Sphere;
 import de.dhbw.visualizer.tree.Node;
 import org.joml.Vector3d;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 public class DivideAndConquerHierarchyTreeGenerator implements HierarchyTreeGenerator {
 
-    public static void main(String[] args) {
-        var treeGenerator = new DivideAndConquerHierarchyTreeGenerator();
-
-        for (int count = 0; count < 100; count++) {
-            List<Sphere> spheres = new ArrayList<>();
-            Random random = new Random();
-            for (int i = 0; i < 10_00000; i++) {
-                spheres.add(new Sphere(new Vector3d(random.nextInt(0, 100), random.nextInt(0, 100), random.nextInt(0, 100)),
-                        random.nextInt(1, 5)));
-            }
-
-            long time = System.currentTimeMillis();
-            // Random number generator can generate multiple points with same center position.
-            // These duplicates are removed, to prevent a stack overflow exception
-            var sphereSet = new HashSet<>(spheres);
-            var tree = treeGenerator.constructHierarchyTree(new ArrayList<>(sphereSet));
-            time = System.currentTimeMillis() - time;
-            System.out.printf("Tree generated in %dms%n", time);
-        }
-    }
-
     @Override
     public Node constructHierarchyTree(List<Sphere> spheres) {
-        return divide(spheres);
+        // If there are several points in the same place, they prevent the algorithm from constructing the tree correctly.
+        // For this reason, all duplicates are removed at the beginning
+        var sphereSet = new HashSet<>(spheres);
+        return divide(new ArrayList<>(sphereSet));
     }
 
     private Node divide(List<Sphere> spheres) {
@@ -138,22 +122,22 @@ public class DivideAndConquerHierarchyTreeGenerator implements HierarchyTreeGene
     }
 
     private RectangularBB constructRectangularBB(List<Sphere> spheres) {
-        double minX = Double.MAX_VALUE;
-        double minY = Double.MAX_VALUE;
-        double minZ = Double.MAX_VALUE;
+        double minX = 10000000;
+        double minY = 10000000;
+        double minZ = 10000000;
 
-        double maxX = Double.MIN_VALUE;
-        double maxY = Double.MIN_VALUE;
-        double maxZ = Double.MIN_VALUE;
+        double maxX = -10000000; // extremely small number
+        double maxY = -10000000;
+        double maxZ = -10000000;
 
         for (Sphere sphere : spheres) {
             minX = Math.min(minX, sphere.center().x());
             minY = Math.min(minY, sphere.center().y());
             minZ = Math.min(minZ, sphere.center().z());
 
-            maxX = Math.max(maxX, sphere.center().x());
-            maxY = Math.max(maxY, sphere.center().y());
-            maxZ = Math.max(maxZ, sphere.center().z());
+            maxX = max(maxX, sphere.center().x());
+            maxY = max(maxY, sphere.center().y());
+            maxZ = max(maxZ, sphere.center().z());
         }
 
         return new RectangularBB(
@@ -165,5 +149,9 @@ public class DivideAndConquerHierarchyTreeGenerator implements HierarchyTreeGene
     private enum Side {
         LOWER,
         UPPER
+    }
+
+    private static double max(double v1, double v2) {
+        return v1 > v2 ? v1 : v2;
     }
 }
