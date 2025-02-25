@@ -36,7 +36,7 @@ public class StlToSpheresGenerator implements SphereGenerator {
 
         try {
             //TODO streamline file loading
-            LOGGER.info("Loading stl file from " + mesh.getPath());
+           // LOGGER.info("Loading stl file from " + mesh.getPath());
             Stl stl = Stl.fromFile(new File(mesh.getPath()));
 
             for (Triangle triangle : stl.triangles()) {

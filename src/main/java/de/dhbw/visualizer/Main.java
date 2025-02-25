@@ -1,13 +1,15 @@
 package de.dhbw.visualizer;
 
+import de.dhbw.visualizer.collision.SelfCollisionResult;
 import de.dhbw.visualizer.collision.SphereCollisionDetection;
 import de.dhbw.visualizer.collision.approximation.StlToSpheresGenerator;
+import de.dhbw.visualizer.collision.distance.DefaultDistanceCalculator;
 import de.dhbw.visualizer.collision.hierarchy.DivideAndConquerHierarchyTreeGenerator;
 import de.dhbw.visualizer.math.Sphere;
 import de.dhbw.visualizer.math.Triangle;
+import de.dhbw.visualizer.utils.LogUtils;
 import de.orat.math.xml.urdf.Visualizer;
 import de.orat.math.xml.urdf.api.Chain;
-import de.orat.math.xml.urdf.api.Link;
 import de.orat.math.xml.urdf.api.Urdf;
 import de.orat.view3d.euclid3dviewapi.spi.iEuclidViewer3D;
 import org.jogamp.vecmath.Point3d;
@@ -16,10 +18,14 @@ import java.awt.*;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class Main {
 
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getSimpleName());
+
     public static void main(String[] args) throws Exception {
+        LogUtils.setup();
         System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
 
         Urdf jurdf = new Urdf(Visualizer.class.getResourceAsStream("ur5eA.urdf"));
@@ -27,11 +33,19 @@ public class Main {
         var collisionDetection = SphereCollisionDetection.builder()
                 .approximation(new StlToSpheresGenerator(0.001, 5))
                 .hierarchyTree(new DivideAndConquerHierarchyTreeGenerator())
+                .distanceCalculator(new DefaultDistanceCalculator())
                 .setRobotChain(chain)
                 .build();
-        System.out.println(collisionDetection);
 
-        launchVisualizer(collisionDetection);
+        collisionDetection.calculateStats();
+        var selfCollision = collisionDetection.detectSelfCollision();
+        LOGGER.info("Status: " + selfCollision.status() + " | Collision between " + selfCollision.collidedLinks().size() + " links");
+
+        for (SelfCollisionResult.CollisionEntry collidedLink : selfCollision.collidedLinks()) {
+            LOGGER.warning("Collision at " + collidedLink.link1() + " and " + collidedLink.link2());
+        }
+
+        //launchVisualizer(collisionDetection);
     }
 
     private static void launchVisualizer(SphereCollisionDetection detection) throws Exception {
@@ -40,17 +54,16 @@ public class Main {
 
             visualizer.getViewer().open();
             drawStl(visualizer.getViewer());
-            for (Map.Entry<Link, List<Sphere>> entry : detection.getRawSpheres().entrySet()) {
-                if (!entry.getKey().getName().equals("forearm_link"))
+            for (Map.Entry<String, List<Sphere>> entry : detection.getRawSpheres().entrySet()) {
+                if (!entry.getKey().equals("forearm_link"))
                     continue;
                 var color = getColor();
-                System.out.println(entry.getKey().getName());
                 for (Sphere sphere : entry.getValue()) {
-               //     visualizer.getViewer().addSphere(new Point3d(sphere.x(), sphere.y(), sphere.z()), sphere.radius(), color, entry.getKey().getName(), true);
+                    //     visualizer.getViewer().addSphere(new Point3d(sphere.x(), sphere.y(), sphere.z()), sphere.radius(), color, entry.getKey().getName(), true);
                 }
             }
         } else {
-            System.out.println("No Visualizer implementation found!");
+            LOGGER.warning("No Visualizer implementation found!");
         }
     }
 
