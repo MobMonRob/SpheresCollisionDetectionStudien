@@ -4,7 +4,6 @@ import de.dhbw.visualizer.Stl;
 import de.dhbw.visualizer.collision.CollisionConstructionException;
 import de.dhbw.visualizer.math.Sphere;
 import de.dhbw.visualizer.math.Triangle;
-import de.orat.math.xml.urdf.Visualizer;
 import de.orat.math.xml.urdf.visual.Mesh;
 import de.orat.math.xml.urdf.visual.Shape;
 import org.joml.Vector3d;
@@ -62,7 +61,12 @@ public class StlToSpheresGenerator implements SphereGenerator {
         var c = triangle.p3();
 
         List<Vector3d> spheres = new ArrayList<>();
-        double heightStep = 2 * r * Math.sqrt(2.0 / 3.0); // Abstand der Schichten (HCP)
+        spheres.add(new Vector3d(a));
+        spheres.add(new Vector3d(b));
+        spheres.add(new Vector3d(c));
+
+        //TODO scan conversation
+        /*double heightStep = 2 * r * Math.sqrt(2.0 / 3.0); // Abstand der Schichten (HCP)
 
         // Normale zum Dreieck berechnen
         var ab = new Vector3d(b).sub(a);
@@ -90,7 +94,7 @@ public class StlToSpheresGenerator implements SphereGenerator {
                 }
                 shiftRow = !shiftRow;
             }
-        }
+        }*/
 
         return spheres;
     }

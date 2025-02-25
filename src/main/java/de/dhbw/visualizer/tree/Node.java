@@ -8,6 +8,19 @@ public record Node(
         Node right
 ) {
 
+    public static Node leafNode(Sphere sphere) {
+        return new Node(sphere, null, null);
+    }
+
+    /**
+     * A node is considered a leaf if it has no child elements.
+     *
+     * @return If the element is a leaf.
+     */
+    public boolean isLeaf() {
+        return this.left == null && this.right == null;
+    }
+
     public int size() {
         int size = 0;
 
