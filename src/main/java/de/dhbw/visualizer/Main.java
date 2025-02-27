@@ -29,7 +29,7 @@ public class Main {
         Urdf jurdf = new Urdf(Visualizer.class.getResourceAsStream("ur5eA.urdf"));
         Chain chain = jurdf.createChain();
         var collisionDetection = SphereCollisionDetection.builder()
-                .approximation(new StlToSpheresGenerator(0.01, 5))
+                .approximation(new StlToSpheresGenerator(0.05))
                 .hierarchyTree(new DivideAndConquerHierarchyTreeGenerator())
                 .distanceCalculator(new DefaultDistanceCalculator(0.0))
                 .setRobotChain(chain)
@@ -97,8 +97,8 @@ public class Main {
 
         double r = 0.01;
 
-        var generator = new StlToSpheresGenerator(r, 5);
-        var spheres = generator.placeSpheres(triangle, r, 100);
+        var generator = new StlToSpheresGenerator(r);
+        var spheres = generator.placeSpheres(triangle);
 
         //  drawSpheres(visualizer, spheres.stream().map(s -> new Sphere(s, r)).toList());
     }

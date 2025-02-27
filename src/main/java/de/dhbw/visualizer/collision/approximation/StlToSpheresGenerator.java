@@ -18,11 +18,9 @@ public class StlToSpheresGenerator implements SphereGenerator {
 
     private static final Logger LOGGER = Logger.getLogger(StlToSpheresGenerator.class.getSimpleName());
     private final double radius;
-    private final int layers;
 
-    public StlToSpheresGenerator(double radius, int layers) {
+    public StlToSpheresGenerator(double radius) {
         this.radius = radius;
-        this.layers = layers;
     }
 
     @Override
@@ -39,7 +37,7 @@ public class StlToSpheresGenerator implements SphereGenerator {
             Stl stl = Stl.fromFile(new File(mesh.getPath()));
 
             for (Triangle triangle : stl.triangles()) {
-                result.addAll(placeSpheres(triangle, this.radius, this.layers).stream()
+                result.addAll(placeSpheres(triangle).stream()
                         .map(s -> new Sphere(s, radius))
                         .toList());
             }
@@ -55,48 +53,33 @@ public class StlToSpheresGenerator implements SphereGenerator {
         return Shape.ShapeType.mesh;
     }
 
-    public List<Vector3d> placeSpheres(Triangle triangle, double r, int layers) {
+    public List<Vector3d> placeSpheres(Triangle triangle) {
         var a = triangle.p1();
         var b = triangle.p2();
         var c = triangle.p3();
 
         List<Vector3d> spheres = new ArrayList<>();
+
         spheres.add(new Vector3d(a));
         spheres.add(new Vector3d(b));
         spheres.add(new Vector3d(c));
 
-        //TODO scan conversation
-        /*double heightStep = 2 * r * Math.sqrt(2.0 / 3.0); // Abstand der Schichten (HCP)
+        spheres.add(midpoint(a, b));
+        spheres.add(midpoint(b, c));
+        spheres.add(midpoint(c, a));
 
-        // Normale zum Dreieck berechnen
-        var ab = new Vector3d(b).sub(a);
-        var ac = new Vector3d(c).sub(a);
-        var normal = ab.cross(ac).normalize();
+        Vector3d centroid = new Vector3d(
+                (a.x() + b.x() + c.x()) / 3,
+                (a.y() + b.y() + c.y()) / 3,
+                (a.z() + b.z() + c.z()) / 3
+        );
 
-        double minX = Math.min(a.x, Math.min(b.x, c.x));
-        double maxX = Math.max(a.x, Math.max(b.x, c.x));
-        double minY = Math.min(a.y, Math.min(b.y, c.y));
-        double maxY = Math.max(a.y, Math.max(b.y, c.y));
-
-        // Hexagonal shift
-        boolean shiftRow = false;
-
-        for (int layer = 0; layer < layers; layer++) {
-            double zOffset = layer * heightStep;
-            var layerOffset = new Vector3d(normal).mul(zOffset);
-
-            for (double y = minY; y <= maxY; y += heightStep) {
-                for (double x = minX + (shiftRow ? r : 0); x <= maxX; x += 2 * r) {
-                    var candidate = new Vector3d(x, y, 0).add(layerOffset);
-                    if (isPointInTriangle(candidate, a, b, c)) {
-                        spheres.add(candidate);
-                    }
-                }
-                shiftRow = !shiftRow;
-            }
-        }*/
-
+        spheres.add(centroid);
         return spheres;
+    }
+
+    private Vector3d midpoint(Vector3d a, Vector3d b) {
+        return new Vector3d((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2);
     }
 
     private static boolean isPointInTriangle(Vector3d p, Vector3d a, Vector3d b, Vector3d c) {
