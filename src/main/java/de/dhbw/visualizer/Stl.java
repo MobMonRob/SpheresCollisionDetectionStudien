@@ -21,6 +21,21 @@ import java.util.StringTokenizer;
 public record Stl(
         List<Triangle> triangles
 ) {
+
+    public List<Vector3d> toPolygonPoints() {
+        List<Vector3d> points = new ArrayList<>();
+
+        for (Triangle triangle : triangles) {
+            points.add(triangle.p1());
+            points.add(triangle.p2());
+            points.add(triangle.p3());
+        }
+
+        return points;
+    }
+
+    public static final List<Stl> LOADED_STL = new ArrayList<>();
+
     public static Stl fromFile(File file) throws IOException {
         try (var accessFile = new RandomAccessFile(file, "r");
              var channel = accessFile.getChannel()) {
@@ -43,13 +58,16 @@ public record Stl(
         // Read stl header
         var header = new byte[80];
         byteBuffer.get(header);
-
+        Stl stl;
         if (isAscii(header)) {
             byteBuffer.position(0);
-            return fromAscii(byteBuffer);
+            stl = fromAscii(byteBuffer);
+        } else {
+            stl = fromBinary(byteBuffer);
         }
 
-        return fromBinary(byteBuffer);
+        LOADED_STL.add(stl);
+        return stl;
     }
 
     private static Stl fromBinary(ByteBuffer byteBuffer) throws IOException {

@@ -47,7 +47,6 @@ public class StlToSpheresGenerator implements SphereGenerator {
             throw new CollisionConstructionException(ex);
         }
 
-        //result.add(new Sphere(new Vector3d(0, 0, 0), 2));
         return result;
     }
 

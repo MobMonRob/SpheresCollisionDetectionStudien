@@ -12,7 +12,7 @@ public class DefaultDistanceCalculator implements DistanceCalculator {
 
     @Override
     public double distance(Node node1, Node node2) {
-        return search(node1, node2, 100000);
+        return search(node1, node2, Double.POSITIVE_INFINITY);
     }
 
     private double search(Node node1, Node node2, double d) {
