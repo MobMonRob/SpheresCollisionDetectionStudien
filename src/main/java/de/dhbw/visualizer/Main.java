@@ -30,7 +30,7 @@ public class Main {
         Urdf jurdf = new Urdf(Visualizer.class.getResourceAsStream("ur5eA.urdf"));
         Chain chain = jurdf.createChain();
         var collisionDetection = SphereCollisionDetection.builder()
-                .approximation(new StlToSpheresGenerator(0.001, 5))
+                .approximation(new StlToSpheresGenerator(0.1, 5))
                 .hierarchyTree(new DivideAndConquerHierarchyTreeGenerator())
                 .distanceCalculator(new DefaultDistanceCalculator(0.0))
                 .setRobotChain(chain)
