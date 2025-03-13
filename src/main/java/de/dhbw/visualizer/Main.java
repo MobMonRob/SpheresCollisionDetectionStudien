@@ -13,9 +13,6 @@ import de.orat.math.xml.urdf.api.Chain;
 import de.orat.math.xml.urdf.api.Urdf;
 import de.orat.view3d.euclid3dviewapi.spi.iEuclidViewer3D;
 import org.jogamp.vecmath.Point3d;
-import org.jzy3d.maths.Coord3d;
-import org.jzy3d.plot3d.transform.Transform;
-import org.jzy3d.plot3d.transform.Translate;
 
 import java.awt.*;
 import java.util.List;
@@ -65,9 +62,9 @@ public class Main {
 
     private static int counter = 0;
 
-    private static Color getColor() {
+    private static Color getColor(int i) {
         counter++;
-        return switch (counter % 8) {
+        return switch (i % 8) {
             case 0 -> Color.CYAN;
             case 1 -> Color.RED;
             case 2 -> Color.BLUE;
@@ -81,24 +78,20 @@ public class Main {
     }
 
     private static void drawStl(iEuclidViewer3D visualizer) {
-
+        int i = 0;
         for (var entry : SphereCollisionDetection.VISUALIZATION.entrySet()) {
             var polygonPoints = entry.getKey().toPolygonPoints().stream()
                     .map(v -> new Point3d(v.x(), v.y(), v.z()))
                     .toList()
                     .toArray(value -> new Point3d[0]);
             var transformation = entry.getValue().getRPYXYZ();
-            visualizer.addPolygone(new Point3d(polygonPoints[0]), polygonPoints, getColor(), null, true, true,
-                    new Transform(
-                            new Translate(new Coord3d(transformation.xyz().getX(), transformation.xyz().getY(), transformation.xyz().getZ())),
-                            TransformUtils.rotationFromEulerAngles(transformation)
-                    )
-            );
+            visualizer.addPolygone(new Point3d(polygonPoints[0]), polygonPoints, getColor(i), null, true, true, TransformUtils.transform(transformation));
+            i++;
         }
     }
 
     private static void drawSpheres(iEuclidViewer3D visualizer, List<Sphere> spheres) {
-        var color = getColor();
+        var color = getColor(0);
         for (Sphere sphere : spheres) {
             //  visualizer.addSphere(new Point3d(sphere.x(), sphere.y(), sphere.z()), sphere.radius(), color, "", true);
         }

@@ -5,6 +5,7 @@ import de.dhbw.visualizer.Stl;
 import de.dhbw.visualizer.collision.approximation.SphereGenerator;
 import de.dhbw.visualizer.collision.distance.DistanceCalculator;
 import de.dhbw.visualizer.collision.hierarchy.HierarchyTreeGenerator;
+import de.dhbw.visualizer.jurdf.ProcessedChain;
 import de.dhbw.visualizer.math.Sphere;
 import de.dhbw.visualizer.tree.Node;
 import de.orat.math.xml.urdf.api.Chain;
@@ -12,7 +13,6 @@ import de.orat.math.xml.urdf.api.CollisionParameters;
 import de.orat.math.xml.urdf.api.Link;
 import de.orat.math.xml.urdf.visual.Shape;
 import lombok.Getter;
-import org.jogamp.vecmath.Matrix4d;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -25,7 +25,7 @@ public final class SphereCollisionDetection {
      * @deprecated Should be replaced with a more robust system, which should also work with other formats than stl.
      */
     @Deprecated(since = "1.0.0")
-    public static Map<Stl, CollisionParameters> VISUALIZATION = new HashMap<>();
+    public static final Map<Stl, CollisionParameters> VISUALIZATION = new HashMap<>();
 
     private static final Logger LOGGER = Logger.getLogger(SphereCollisionDetection.class.getSimpleName());
 
@@ -48,7 +48,9 @@ public final class SphereCollisionDetection {
     }
 
     private void setup(Chain chain) {
-        for (var link : chain.getLinks().values()) {
+        var helper = ProcessedChain.chain(chain);
+
+        for (var link : helper.getLinks()) {
             setupLink(link);
         }
     }
@@ -65,14 +67,14 @@ public final class SphereCollisionDetection {
         List<Sphere> spheres = new ArrayList<>();
 
         for (CollisionParameters collisionParameter : link.getCollisionParameters()) {
-            spheres.addAll(toSpheres(link, collisionParameter));
+            spheres.addAll(toSpheres(collisionParameter));
         }
 
         LOGGER.info(() -> link.getName() + " spheres: " + spheres.size());
         return spheres;
     }
 
-    private List<Sphere> toSpheres(Link link, CollisionParameters collisionParameter) {
+    private List<Sphere> toSpheres(CollisionParameters collisionParameter) {
         var shape = collisionParameter.getShape();
         var approximator = this.approximation.get(shape.getShapeType());
 
@@ -82,11 +84,6 @@ public final class SphereCollisionDetection {
 
         return approximator.toSphere(shape, collisionParameter);
     }
-
-    private Matrix4d toTransformationMatrix(Link link) {
-        return link.getAbsTF();
-    }
-
 
     public void calculateStats() {
         LOGGER.info("---- STATS ----");
@@ -142,7 +139,7 @@ public final class SphereCollisionDetection {
 
     public static class Builder {
 
-        private final Map<Shape.ShapeType, SphereGenerator> approximation = new HashMap<>();
+        private final Map<Shape.ShapeType, SphereGenerator> approximation = new EnumMap<>(Shape.ShapeType.class);
         private Chain chain;
         private HierarchyTreeGenerator hierarchyTreeGenerator;
         private DistanceCalculator distanceCalculator;

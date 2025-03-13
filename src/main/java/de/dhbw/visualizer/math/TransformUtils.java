@@ -5,8 +5,17 @@ import org.jogamp.vecmath.Quat4d;
 import org.joml.AxisAngle4d;
 import org.jzy3d.maths.Coord3d;
 import org.jzy3d.plot3d.transform.Rotate;
+import org.jzy3d.plot3d.transform.Transform;
+import org.jzy3d.plot3d.transform.Translate;
 
 public class TransformUtils {
+
+    public static Transform transform(Chain.RPYXYZ transformation) {
+        return new Transform(
+                new Translate(new Coord3d(transformation.xyz().getX(), transformation.xyz().getY(), transformation.xyz().getZ())),
+                TransformUtils.rotationFromEulerAngles(transformation)
+        );
+    }
 
     public static Rotate rotationFromEulerAngles(Chain.RPYXYZ rpyxyz) {
         return rotationFromEulerAngles(rpyxyz.rpy().yaw(), rpyxyz.rpy().pitch(), rpyxyz.rpy().roll());

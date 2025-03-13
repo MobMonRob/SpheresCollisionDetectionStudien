@@ -19,6 +19,7 @@ import java.util.StringTokenizer;
  * @see <a href="https://en.wikipedia.org/wiki/STL_(file_format)">STL (file format)</a>
  */
 public record Stl(
+        String name,
         List<Triangle> triangles
 ) {
 
@@ -43,31 +44,31 @@ public record Stl(
             buffer.flip();
             buffer.order(ByteOrder.LITTLE_ENDIAN);
 
-            return fromBuffer(buffer);
+            return fromBuffer(file.getName(), buffer);
         }
     }
 
-    public static Stl fromStream(InputStream inputStream) throws IOException {
+    public static Stl fromStream(String name, InputStream inputStream) throws IOException {
         var bytes = IOUtils.toByteArray(inputStream);
-        return fromBuffer(ByteBuffer.wrap(bytes));
+        return fromBuffer(name, ByteBuffer.wrap(bytes));
     }
 
-    private static Stl fromBuffer(ByteBuffer byteBuffer) throws IOException {
+    private static Stl fromBuffer(String name, ByteBuffer byteBuffer) throws IOException {
         // Read stl header
         var header = new byte[80];
         byteBuffer.get(header);
         Stl stl;
         if (isAscii(header)) {
             byteBuffer.position(0);
-            stl = fromAscii(byteBuffer);
+            stl = fromAscii(name, byteBuffer);
         } else {
-            stl = fromBinary(byteBuffer);
+            stl = fromBinary(name, byteBuffer);
         }
 
         return stl;
     }
 
-    private static Stl fromBinary(ByteBuffer byteBuffer) throws IOException {
+    private static Stl fromBinary(String name, ByteBuffer byteBuffer) throws IOException {
         var triangles = new ArrayList<Triangle>();
 
         // Read elements
@@ -93,10 +94,10 @@ public record Stl(
                     byteBuffer.position(), byteBuffer.remaining()));
         }
 
-        return new Stl(triangles);
+        return new Stl(name, triangles);
     }
 
-    private static Stl fromAscii(ByteBuffer byteBuffer) throws IOException {
+    private static Stl fromAscii(String name, ByteBuffer byteBuffer) throws IOException {
         var triangles = new ArrayList<Triangle>();
 
         byte[] data = new byte[byteBuffer.remaining()];
@@ -126,7 +127,7 @@ public record Stl(
             throw new IOException("Tokenizer must be empty at this point.");
         }
 
-        return new Stl(triangles);
+        return new Stl(name, triangles);
     }
 
     private static Triangle parseAsciiBlock(StringTokenizer tokenizer) throws IOException {
