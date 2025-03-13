@@ -34,8 +34,6 @@ public record Stl(
         return points;
     }
 
-    public static final List<Stl> LOADED_STL = new ArrayList<>();
-
     public static Stl fromFile(File file) throws IOException {
         try (var accessFile = new RandomAccessFile(file, "r");
              var channel = accessFile.getChannel()) {
@@ -66,7 +64,6 @@ public record Stl(
             stl = fromBinary(byteBuffer);
         }
 
-        LOADED_STL.add(stl);
         return stl;
     }
 

@@ -1,6 +1,7 @@
 package de.dhbw.visualizer.collision;
 
 import com.google.common.base.Preconditions;
+import de.dhbw.visualizer.Stl;
 import de.dhbw.visualizer.collision.approximation.SphereGenerator;
 import de.dhbw.visualizer.collision.distance.DistanceCalculator;
 import de.dhbw.visualizer.collision.hierarchy.HierarchyTreeGenerator;
@@ -11,11 +12,20 @@ import de.orat.math.xml.urdf.api.CollisionParameters;
 import de.orat.math.xml.urdf.api.Link;
 import de.orat.math.xml.urdf.visual.Shape;
 import lombok.Getter;
+import org.jogamp.vecmath.Matrix4d;
 
 import java.util.*;
 import java.util.logging.Logger;
 
 public final class SphereCollisionDetection {
+
+    /**
+     * Used to visualize the different links.
+     *
+     * @deprecated Should be replaced with a more robust system, which should also work with other formats than stl.
+     */
+    @Deprecated(since = "1.0.0")
+    public static Map<Stl, CollisionParameters> VISUALIZATION = new HashMap<>();
 
     private static final Logger LOGGER = Logger.getLogger(SphereCollisionDetection.class.getSimpleName());
 
@@ -55,19 +65,28 @@ public final class SphereCollisionDetection {
         List<Sphere> spheres = new ArrayList<>();
 
         for (CollisionParameters collisionParameter : link.getCollisionParameters()) {
-            var shape = collisionParameter.getShape();
-            var approximator = this.approximation.get(shape.getShapeType());
-
-            if (approximator == null) {
-                throw new IllegalArgumentException(String.format("No shape approximator defined for %s", shape.getShapeType()));
-            }
-
-            var shapeSpheres = approximator.toSphere(shape);
-            spheres.addAll(shapeSpheres);
+            spheres.addAll(toSpheres(link, collisionParameter));
         }
-        LOGGER.info(link.getName() + " spheres: " + spheres.size());
+
+        LOGGER.info(() -> link.getName() + " spheres: " + spheres.size());
         return spheres;
     }
+
+    private List<Sphere> toSpheres(Link link, CollisionParameters collisionParameter) {
+        var shape = collisionParameter.getShape();
+        var approximator = this.approximation.get(shape.getShapeType());
+
+        if (approximator == null) {
+            throw new IllegalArgumentException(String.format("No shape approximator defined for %s", shape.getShapeType()));
+        }
+
+        return approximator.toSphere(shape, collisionParameter);
+    }
+
+    private Matrix4d toTransformationMatrix(Link link) {
+        return link.getAbsTF();
+    }
+
 
     public void calculateStats() {
         LOGGER.info("---- STATS ----");

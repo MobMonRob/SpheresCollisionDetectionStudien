@@ -2,8 +2,10 @@ package de.dhbw.visualizer.collision.approximation;
 
 import de.dhbw.visualizer.Stl;
 import de.dhbw.visualizer.collision.CollisionConstructionException;
+import de.dhbw.visualizer.collision.SphereCollisionDetection;
 import de.dhbw.visualizer.math.Sphere;
 import de.dhbw.visualizer.math.Triangle;
+import de.orat.math.xml.urdf.api.CollisionParameters;
 import de.orat.math.xml.urdf.visual.Mesh;
 import de.orat.math.xml.urdf.visual.Shape;
 import org.joml.Vector3d;
@@ -24,7 +26,7 @@ public class StlToSpheresGenerator implements SphereGenerator {
     }
 
     @Override
-    public List<Sphere> toSphere(Shape inputData) {
+    public List<Sphere> toSphere(Shape inputData, CollisionParameters link) {
         if (!(inputData instanceof Mesh mesh)) {
             throw new IllegalArgumentException("Invalid input type " + inputData.getClass().getName());
         }
@@ -35,6 +37,7 @@ public class StlToSpheresGenerator implements SphereGenerator {
             //TODO streamline file loading
             // LOGGER.info("Loading stl file from " + mesh.getPath());
             Stl stl = Stl.fromFile(new File(mesh.getPath()));
+            SphereCollisionDetection.VISUALIZATION.put(stl, link);
 
             for (Triangle triangle : stl.triangles()) {
                 result.addAll(placeSpheres(triangle).stream()

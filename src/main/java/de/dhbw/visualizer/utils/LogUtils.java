@@ -26,8 +26,8 @@ public class LogUtils {
         private static final String FORMAT = "[%1$tF %1$tT.%1$tL] [%2$-7s] %3$s %n";
 
         @Override
-        public String format(LogRecord record) {
-            return String.format(FORMAT, new Date(record.getMillis()), record.getLevel().getLocalizedName(), record.getMessage());
+        public String format(LogRecord logRecord) {
+            return String.format(FORMAT, new Date(logRecord.getMillis()), logRecord.getLevel().getLocalizedName(), logRecord.getMessage());
         }
     }
 
