@@ -8,7 +8,13 @@ import java.util.List;
 
 public interface SphereGenerator {
 
-    List<Sphere> toSphere(Shape inputData, CollisionParameters link);
+    /**
+     * @param shape Die eingegebene Form.
+     * @param link Der eingegebene Kollisionsparameter des URDF-Links
+     * @return Eine Liste von Kugeln, die die Form abbilden
+     * @throws UnsupportedOperationException - Wenn die eingegebene Form nicht von diesem SphereGenerator unterstützt wird.
+     */
+    List<Sphere> toSphere(Shape shape, CollisionParameters link);
 
     Shape.ShapeType getShapeType();
 }

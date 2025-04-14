@@ -13,6 +13,7 @@ import de.orat.math.xml.urdf.api.Chain;
 import de.orat.math.xml.urdf.api.Urdf;
 import de.orat.view3d.euclid3dviewapi.spi.iEuclidViewer3D;
 import org.jogamp.vecmath.Point3d;
+import org.jzy3d.chart.factories.NewtChartFactory;
 
 import java.awt.*;
 import java.util.List;
@@ -85,7 +86,9 @@ public class Main {
                     .toList()
                     .toArray(value -> new Point3d[0]);
             var transformation = entry.getValue().getRPYXYZ();
-            visualizer.addPolygone(new Point3d(polygonPoints[0]), polygonPoints, getColor(i), null, true, true, TransformUtils.transform(transformation));
+            var solidColor = getColor(i);
+            var color = new Color(solidColor.getRed(), solidColor.getGreen(), solidColor.getBlue(), 32);
+            visualizer.addPolygone(new Point3d(polygonPoints[0]), polygonPoints, color, null, true, true, TransformUtils.transform(transformation));
             i++;
         }
     }

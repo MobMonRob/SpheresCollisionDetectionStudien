@@ -85,7 +85,7 @@ public record Stl(
             byte[] attributeData = new byte[attributes];
             byteBuffer.get(attributeData);
 
-            triangles.add(new Triangle(p1, p2, p3));
+            triangles.add(new Triangle(normal, p1, p2, p3));
         }
 
         // Check if the buffer is empty
@@ -145,7 +145,7 @@ public record Stl(
         requireToken(tokenizer, "endloop");
         requireToken(tokenizer, "endfacet");
 
-        return new Triangle(p1, p2, p3);
+        return new Triangle(normal, p1, p2, p3);
     }
 
     private static Vector3d parseVertex(StringTokenizer tokenizer) throws IOException {
