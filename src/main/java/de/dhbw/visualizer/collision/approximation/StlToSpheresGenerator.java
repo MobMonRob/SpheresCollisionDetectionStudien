@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 
 public class StlToSpheresGenerator implements SphereGenerator {
 
-    private static final Logger LOGGER = Logger.getLogger(StlToSpheresGenerator.class.getSimpleName());
     private final double radius;
 
     public StlToSpheresGenerator(double radius) {
@@ -36,18 +35,16 @@ public class StlToSpheresGenerator implements SphereGenerator {
         var result = new ArrayList<Sphere>();
 
         try {
-            //TODO streamline file loading
-            // LOGGER.info("Loading stl file from " + mesh.getPath());
             Stl stl = Stl.fromFile(new File(mesh.getPath()));
             SphereCollisionDetection.VISUALIZATION.put(stl, link);
             var transform = TransformUtils.transform(link.getRPYXYZ());
             for (Triangle triangle : stl.triangles()) {
                 result.addAll(placeSpheres(triangle).stream()
-                        .map(s -> {
-                            var pos = transform.compute(new Coord3d(s.x, s.y, s.z));
-                            return new Vector3d(pos.x, pos.y, pos.z);
+                        .map(sphere -> {
+                            var center = sphere.center();
+                            var pos = transform.compute(new Coord3d(center.x, center.y, center.z));
+                            return new Sphere(new Vector3d(pos.x, pos.y, pos.z), sphere.radius());
                         })
-                        .map(s -> new Sphere(s, radius))
                         .toList());
             }
         } catch (IOException ex) {
@@ -62,28 +59,38 @@ public class StlToSpheresGenerator implements SphereGenerator {
         return Shape.ShapeType.mesh;
     }
 
-    public List<Vector3d> placeSpheres(Triangle triangle) {
+    public List<Sphere> placeSpheres(Triangle triangle) {
         var a = triangle.p1();
         var b = triangle.p2();
         var c = triangle.p3();
 
-        List<Vector3d> spheres = new ArrayList<>();
+        List<Sphere> spheres = new ArrayList<>();
+        spheres.addAll(this.placeSpheresOnLine(a, b));
+        spheres.addAll(this.placeSpheresOnLine(a, c));
+        spheres.addAll(this.placeSpheresOnLine(b, c));
 
-        spheres.add(new Vector3d(a));
-        spheres.add(new Vector3d(b));
-        spheres.add(new Vector3d(c));
+        return spheres;
+    }
 
-        spheres.add(midpoint(a, b));
-        spheres.add(midpoint(b, c));
-        spheres.add(midpoint(c, a));
+    private List<Sphere> placeSpheresOnLine(Vector3d p1, Vector3d p2) {
+        var minX = Math.min(p1.x(), p2.x());
+        var minY = Math.min(p1.y(), p2.y());
+        var minZ = Math.min(p1.z(), p2.z());
 
-        Vector3d centroid = new Vector3d(
-                (a.x() + b.x() + c.x()) / 3,
-                (a.y() + b.y() + c.y()) / 3,
-                (a.z() + b.z() + c.z()) / 3
-        );
+        var maxX = Math.max(p1.x(), p2.x());
+        var maxY = Math.max(p1.y(), p2.y());
+        var maxZ = Math.max(p1.z(), p2.z());
 
-        spheres.add(centroid);
+        List<Sphere> spheres = new ArrayList<>();
+
+        for (double x = minX; x < maxX; x += this.radius) {
+            for (double y = minY; y < maxY; y += this.radius) {
+                for (double z = minZ; z < maxZ; z += this.radius) {
+                    spheres.add(new Sphere(new Vector3d(x, y, z), this.radius));
+                }
+            }
+        }
+
         return spheres;
     }
 
