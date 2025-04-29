@@ -15,8 +15,9 @@ import org.jzy3d.maths.Coord3d;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.Set;
 
 public class StlToSpheresGenerator implements SphereGenerator {
 
@@ -64,37 +65,30 @@ public class StlToSpheresGenerator implements SphereGenerator {
         var b = triangle.p2();
         var c = triangle.p3();
 
-        List<Sphere> spheres = new ArrayList<>();
-        spheres.addAll(this.placeSpheresOnLine(a, b));
-        spheres.addAll(this.placeSpheresOnLine(a, c));
-        spheres.addAll(this.placeSpheresOnLine(b, c));
+        Set<Sphere> spheres = new HashSet<>();
+        spheres.addAll(this.placeSpheresOnLine(new Vector3d(a), new Vector3d(b)));
+        spheres.addAll(this.placeSpheresOnLine(new Vector3d(a), new Vector3d(c)));
+        spheres.addAll(this.placeSpheresOnLine(new Vector3d(b), new Vector3d(c)));
 
-        return spheres;
+        return new ArrayList<>(spheres);
     }
 
-    private List<Sphere> placeSpheresOnLine(Vector3d p1, Vector3d p2) {
-        var minX = Math.min(p1.x(), p2.x());
-        var minY = Math.min(p1.y(), p2.y());
-        var minZ = Math.min(p1.z(), p2.z());
+    private Set<Sphere> placeSpheresOnLine(Vector3d start, Vector3d end) {
+        Set<Sphere> centers = new HashSet<>();
 
-        var maxX = Math.max(p1.x(), p2.x());
-        var maxY = Math.max(p1.y(), p2.y());
-        var maxZ = Math.max(p1.z(), p2.z());
+        Vector3d direction = new Vector3d(end).sub(start);
+        double distance = direction.length();
+        Vector3d unitDirection = direction.normalize();
 
-        List<Sphere> spheres = new ArrayList<>();
+        double spacing = 2 * this.radius;
+        int numSpheres = (int) (distance / spacing) + 1;
 
-        for (double x = minX; x < maxX; x += this.radius) {
-            for (double y = minY; y < maxY; y += this.radius) {
-                for (double z = minZ; z < maxZ; z += this.radius) {
-                    spheres.add(new Sphere(new Vector3d(x, y, z), this.radius));
-                }
-            }
+        for (int i = 0; i < numSpheres; i++) {
+            Vector3d point = new Vector3d(start).add(new Vector3d(unitDirection).mul(i * spacing));
+            centers.add(new Sphere(point, this.radius));
         }
 
-        return spheres;
+        return centers;
     }
 
-    private Vector3d midpoint(Vector3d a, Vector3d b) {
-        return new Vector3d((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2);
-    }
 }

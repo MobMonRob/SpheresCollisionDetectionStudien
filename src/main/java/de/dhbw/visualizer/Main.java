@@ -13,7 +13,6 @@ import de.orat.math.xml.urdf.api.Chain;
 import de.orat.math.xml.urdf.api.Urdf;
 import de.orat.view3d.euclid3dviewapi.spi.iEuclidViewer3D;
 import org.jogamp.vecmath.Point3d;
-import org.jzy3d.chart.factories.NewtChartFactory;
 
 import java.awt.*;
 import java.util.List;
@@ -30,7 +29,7 @@ public class Main {
         Urdf jurdf = new Urdf(Visualizer.class.getResourceAsStream("ur5eA.urdf"));
         Chain chain = jurdf.createChain();
         var collisionDetection = SphereCollisionDetection.builder()
-                .approximation(new StlToSpheresGenerator(0.05))
+                .approximation(new StlToSpheresGenerator(0.08))
                 .hierarchyTree(new DivideAndConquerHierarchyTreeGenerator())
                 .distanceCalculator(new DefaultDistanceCalculator(0.0))
                 .setRobotChain(chain)

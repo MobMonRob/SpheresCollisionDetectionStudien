@@ -40,15 +40,17 @@ public final class SphereCollisionDetection {
     private final Map<String, Node> boundingBoxRepresentations = new HashMap<>();
     @Getter
     private final Map<String, List<Sphere>> rawSpheres = new HashMap<>();
+    private final Chain chain;
 
     private SphereCollisionDetection(Builder builder) {
         this.approximation = builder.approximation;
         this.distanceCalculator = builder.distanceCalculator;
         this.hierarchyTreeGenerator = builder.hierarchyTreeGenerator;
+        this.chain = builder.chain;
     }
 
-    private void setup(Chain chain) {
-        var helper = ProcessedChain.chain(chain);
+    private void setup() {
+        var helper = ProcessedChain.chain(this.chain);
 
         for (var link : helper.getLinks()) {
             setupLink(link);
@@ -109,8 +111,23 @@ public final class SphereCollisionDetection {
         List<SelfCollisionResult.CollisionEntry> collidedLinks = new ArrayList<>();
 
         // Iterate through all link combinations
-        for (Map.Entry<String, Node> e1 : this.boundingBoxRepresentations.entrySet()) {
+        for (Link first : chain.getLinks().values()) {
+            for (Link second : chain.getLinks().values()) {
+                if (first.getName().equals(second.getName()) || first.getParentLink() != null && second.getName().equals(first.getParentLink().getName()) ||
+                        first.getChildrenLinks().stream().anyMatch(l -> l.getName().equals(second.getName()))) {
+                    continue;
+                }
+
+                var collision = collide(boundingBoxRepresentations.get(first.getName()), boundingBoxRepresentations.get(second.getName()));
+
+                if (collision) {
+                    collidedLinks.add(new SelfCollisionResult.CollisionEntry(first.getName(), second.getName()));
+                }
+            }
+        }
+        /*for (Map.Entry<String, Node> e1 : this.boundingBoxRepresentations.entrySet()) {
             for (Map.Entry<String, Node> e2 : this.boundingBoxRepresentations.entrySet()) {
+                System.out.println("L1: " + e1.getKey() + " " + e2.getKey() + " " + this.chain.getLink(e1.getKey()).getParentLink().getName());
                 if (e1.getKey().equals(e2.getKey())) {
                     continue;
                 }
@@ -121,7 +138,7 @@ public final class SphereCollisionDetection {
                     collidedLinks.add(new SelfCollisionResult.CollisionEntry(e1.getKey(), e2.getKey()));
                 }
             }
-        }
+        }*/
 
         return SelfCollisionResult.fromStatusList(collidedLinks);
     }
@@ -173,7 +190,7 @@ public final class SphereCollisionDetection {
             Preconditions.checkNotNull(this.distanceCalculator, "Distance calculator can't be null.");
 
             var collisionDetection = new SphereCollisionDetection(this);
-            collisionDetection.setup(this.chain);
+            collisionDetection.setup();
             return collisionDetection;
         }
     }
