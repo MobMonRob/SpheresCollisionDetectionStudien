@@ -6,6 +6,8 @@ import java.util.Objects;
 
 public record Sphere(Vector3d center, double radius) {
 
+    public static int DISTANCE_COUNTER = 0;
+
     public double x() {
         return center.x();
     }
@@ -23,7 +25,6 @@ public record Sphere(Vector3d center, double radius) {
         double dy = this.y() - other.y();
         double dz = this.z() - other.z();
         var distance = Math.sqrt(dx * dx + dy * dy + dz * dz) - (this.radius + other.radius);
-
         return Math.max(0, distance);
     }
 

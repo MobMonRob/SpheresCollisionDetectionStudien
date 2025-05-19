@@ -26,20 +26,11 @@ public class DivideAndConquerHierarchyTreeGenerator implements HierarchyTreeGene
             return null;
         }
 
-        if (spheres.size() == 2) {
-            return new Node(
-                    calculateCompleteSphereFromChildren(spheres.get(0), spheres.get(1)),
-                    new Node(spheres.get(0), null, null),
-                    new Node(spheres.get(0), null, null)
-            );
-        }
-
         if (spheres.size() == 1) {
             return new Node(
                     spheres.get(0), null, null
             );
         }
-
 
         return divideSphereList(spheres);
     }

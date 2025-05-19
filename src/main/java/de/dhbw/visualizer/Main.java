@@ -10,6 +10,7 @@ import de.dhbw.visualizer.math.TransformUtils;
 import de.dhbw.visualizer.utils.LogUtils;
 import de.orat.math.xml.urdf.Visualizer;
 import de.orat.math.xml.urdf.api.Chain;
+import de.orat.math.xml.urdf.api.Link;
 import de.orat.math.xml.urdf.api.Urdf;
 import de.orat.view3d.euclid3dviewapi.spi.iEuclidViewer3D;
 import org.jogamp.vecmath.Point3d;
@@ -28,6 +29,7 @@ public class Main {
 
         Urdf jurdf = new Urdf(Visualizer.class.getResourceAsStream("ur5eA.urdf"));
         Chain chain = jurdf.createChain();
+        drawTree(chain);
         var collisionDetection = SphereCollisionDetection.builder()
                 .approximation(new StlToSpheresGenerator(0.08))
                 .hierarchyTree(new DivideAndConquerHierarchyTreeGenerator())
@@ -36,9 +38,11 @@ public class Main {
                 .build();
 
         collisionDetection.calculateStats();
+        long collision = System.currentTimeMillis();
         var selfCollision = collisionDetection.detectSelfCollision();
+        long time = System.currentTimeMillis() - collision;
         LOGGER.info(() -> "Status: " + selfCollision.status() + " | Collision between " + selfCollision.collidedLinks().size() + " links");
-
+        LOGGER.info(() -> "Distance calculations: " + Sphere.DISTANCE_COUNTER + " Time: " + time + "ms");
         for (SelfCollisionResult.CollisionEntry collidedLink : selfCollision.collidedLinks()) {
             LOGGER.warning("Collision at " + collidedLink.link1() + " and " + collidedLink.link2());
         }
@@ -50,7 +54,7 @@ public class Main {
         Visualizer visualizer = new Visualizer();
         if (visualizer.getViewer() != null) {
             visualizer.getViewer().open();
-            drawStl(visualizer.getViewer());
+            drawStl(detection, visualizer.getViewer());
 
             for (List<Sphere> value : detection.getRawSpheres().values()) {
                 drawSpheres(visualizer.getViewer(), value);
@@ -77,15 +81,24 @@ public class Main {
         };
     }
 
-    private static void drawStl(iEuclidViewer3D visualizer) {
+    private static void drawStl(SphereCollisionDetection detection, iEuclidViewer3D visualizer) {
         int i = 0;
+        var selfCollision = detection.detectSelfCollision();
+
         for (var entry : SphereCollisionDetection.VISUALIZATION.entrySet()) {
             var polygonPoints = entry.getKey().toPolygonPoints().stream()
                     .map(v -> new Point3d(v.x(), v.y(), v.z()))
                     .toList()
                     .toArray(value -> new Point3d[0]);
             var transformation = entry.getValue().getRPYXYZ();
-            var solidColor = getColor(i);
+            //var solidColor = getColor(i);
+            boolean collide = selfCollision.collidedLinks()
+                    .stream()
+                    .anyMatch(s -> s.link1().equals(entry.getValue().getName()) ||
+                            s.link2().equals(entry.getValue().getName())
+                    );
+
+            var solidColor = collide ? Color.RED : Color.CYAN;
             var color = new Color(solidColor.getRed(), solidColor.getGreen(), solidColor.getBlue(), 32);
             visualizer.addPolygone(new Point3d(polygonPoints[0]), polygonPoints, color, null, true, true, TransformUtils.transform(transformation));
             i++;
@@ -94,8 +107,19 @@ public class Main {
 
     private static void drawSpheres(iEuclidViewer3D visualizer, List<Sphere> spheres) {
         var color = getColor(0);
-        for (Sphere sphere : spheres) {
-            //  visualizer.addSphere(new Point3d(sphere.x(), sphere.y(), sphere.z()), sphere.radius(), color, "", true);
+        for (Sphere sphere : spheres.stream().limit(40).toList()) {
+          //  visualizer.addSphere(new Point3d(sphere.x(), sphere.y(), sphere.z()), sphere.radius(), color, "", true);
+        }
+    }
+
+    private static void drawTree(Chain chain) {
+        drawLink(chain.getRootLink(), 0);
+    }
+
+    private static void drawLink(Link link, int ident) {
+        System.out.println(" ".repeat(ident) + "- " + link.getName());
+        for (Link childrenLink : link.getChildrenLinks()) {
+            drawLink(childrenLink, ident + 2);
         }
     }
 }

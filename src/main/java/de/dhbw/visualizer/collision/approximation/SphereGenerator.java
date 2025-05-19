@@ -14,7 +14,7 @@ public interface SphereGenerator {
      * @return Eine Liste von Kugeln, die die Form abbilden
      * @throws UnsupportedOperationException - Wenn die eingegebene Form nicht von diesem SphereGenerator unterstützt wird.
      */
-    List<Sphere> toSphere(Shape shape, CollisionParameters link);
+    List<Sphere> toSphere(String name,Shape shape, CollisionParameters link);
 
     Shape.ShapeType getShapeType();
 }

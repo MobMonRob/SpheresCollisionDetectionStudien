@@ -38,7 +38,6 @@ public final class SphereCollisionDetection {
     private final DistanceCalculator distanceCalculator;
 
     private final Map<String, Node> boundingBoxRepresentations = new HashMap<>();
-    @Getter
     private final Map<String, List<Sphere>> rawSpheres = new HashMap<>();
     private final Chain chain;
 
@@ -69,14 +68,14 @@ public final class SphereCollisionDetection {
         List<Sphere> spheres = new ArrayList<>();
 
         for (CollisionParameters collisionParameter : link.getCollisionParameters()) {
-            spheres.addAll(toSpheres(collisionParameter));
+            spheres.addAll(toSpheres(link.getName(),collisionParameter));
         }
 
         LOGGER.info(() -> link.getName() + " spheres: " + spheres.size());
         return spheres;
     }
 
-    private List<Sphere> toSpheres(CollisionParameters collisionParameter) {
+    private List<Sphere> toSpheres(String name,CollisionParameters collisionParameter) {
         var shape = collisionParameter.getShape();
         var approximator = this.approximation.get(shape.getShapeType());
 
@@ -84,7 +83,7 @@ public final class SphereCollisionDetection {
             throw new IllegalArgumentException(String.format("No shape approximator defined for %s", shape.getShapeType()));
         }
 
-        return approximator.toSphere(shape, collisionParameter);
+        return approximator.toSphere(name,shape, collisionParameter);
     }
 
     public void calculateStats() {
@@ -125,20 +124,6 @@ public final class SphereCollisionDetection {
                 }
             }
         }
-        /*for (Map.Entry<String, Node> e1 : this.boundingBoxRepresentations.entrySet()) {
-            for (Map.Entry<String, Node> e2 : this.boundingBoxRepresentations.entrySet()) {
-                System.out.println("L1: " + e1.getKey() + " " + e2.getKey() + " " + this.chain.getLink(e1.getKey()).getParentLink().getName());
-                if (e1.getKey().equals(e2.getKey())) {
-                    continue;
-                }
-
-                var collision = collide(e1.getValue(), e2.getValue());
-
-                if (collision) {
-                    collidedLinks.add(new SelfCollisionResult.CollisionEntry(e1.getKey(), e2.getKey()));
-                }
-            }
-        }*/
 
         return SelfCollisionResult.fromStatusList(collidedLinks);
     }
@@ -152,6 +137,10 @@ public final class SphereCollisionDetection {
         }
 
         return this.distanceCalculator.distance(n1, n2) <= 0;
+    }
+
+    public Map<String, List<Sphere>> getRawSpheres() {
+        return rawSpheres;
     }
 
     public static class Builder {

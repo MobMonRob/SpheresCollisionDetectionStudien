@@ -17,7 +17,6 @@ import java.util.List;
  *
  * @author lhert
  */
-@Getter
 public class ProcessedChain {
 
     public static ProcessedChain chain(Chain chain) {
@@ -32,6 +31,10 @@ public class ProcessedChain {
 
     private void recursive(Link link) {
         recursive(null, link);
+    }
+
+    public List<Link> getLinks() {
+        return links;
     }
 
     private void recursive(Chain.RPYXYZ parent, Link link) {

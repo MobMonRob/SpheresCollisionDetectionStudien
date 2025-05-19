@@ -1,5 +1,6 @@
 package de.dhbw.visualizer.collision.distance;
 
+import de.dhbw.visualizer.math.Sphere;
 import de.dhbw.visualizer.tree.Node;
 
 public class DefaultDistanceCalculator implements DistanceCalculator {
@@ -21,7 +22,7 @@ public class DefaultDistanceCalculator implements DistanceCalculator {
         }
 
         double distance = node1.sphere().distance(node2.sphere());
-
+        Sphere.DISTANCE_COUNTER++;
         // Return if distance between n1 and n2 is wider than the current minimum
         if (distance >= d) {
             return d;

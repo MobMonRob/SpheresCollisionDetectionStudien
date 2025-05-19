@@ -28,7 +28,7 @@ public class StlToSpheresGenerator implements SphereGenerator {
     }
 
     @Override
-    public List<Sphere> toSphere(Shape inputData, CollisionParameters link) {
+    public List<Sphere> toSphere(String name,Shape inputData, CollisionParameters link) {
         if (!(inputData instanceof Mesh mesh)) {
             throw new IllegalArgumentException("Invalid input type " + inputData.getClass().getName());
         }
@@ -37,6 +37,7 @@ public class StlToSpheresGenerator implements SphereGenerator {
 
         try {
             Stl stl = Stl.fromFile(new File(mesh.getPath()));
+            link.setName(name);
             SphereCollisionDetection.VISUALIZATION.put(stl, link);
             var transform = TransformUtils.transform(link.getRPYXYZ());
             for (Triangle triangle : stl.triangles()) {
